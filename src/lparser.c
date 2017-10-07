@@ -788,7 +788,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   open_func(ls, &new_fs, &bl);
   checknext(ls, '(');
   if (ismethod) {
-    new_localvarliteral(ls, "self");  /* create 'self' parameter */
+    new_localvarliteral(ls, "this");  /* create 'self' parameter */
     adjustlocalvars(ls, 1);
   }
   parlist(ls);

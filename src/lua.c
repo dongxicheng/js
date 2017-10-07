@@ -19,6 +19,8 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+#include "changer.h"
+
 
 
 #if !defined(LUA_PROMPT)

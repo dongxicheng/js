@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		914C0B431F88B0E300F757D5 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 914C0B421F88B0E300F757D5 /* test.c */; };
+		91690E101F8897BC00222493 /* changer.c in Sources */ = {isa = PBXBuildFile; fileRef = 91690E0F1F88970400222493 /* changer.c */; };
 		91A1E4F61F87F61000573AC0 /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4B91F87F5AC00573AC0 /* lapi.c */; };
 		91A1E4F71F87F61000573AC0 /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4BB1F87F5AC00573AC0 /* lauxlib.c */; };
 		91A1E4F81F87F61000573AC0 /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4BD1F87F5AC00573AC0 /* lbaselib.c */; };
@@ -36,7 +38,6 @@
 		91A1E5101F87F61000573AC0 /* ltable.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4E41F87F5AC00573AC0 /* ltable.c */; };
 		91A1E5111F87F61000573AC0 /* ltablib.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4E61F87F5AC00573AC0 /* ltablib.c */; };
 		91A1E5121F87F61000573AC0 /* ltm.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4E71F87F5AC00573AC0 /* ltm.c */; };
-		91A1E5131F87F61000573AC0 /* lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4E91F87F5AC00573AC0 /* lua.c */; };
 		91A1E5141F87F61000573AC0 /* lundump.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4EF1F87F5AC00573AC0 /* lundump.c */; };
 		91A1E5151F87F61000573AC0 /* lutf8lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4F11F87F5AC00573AC0 /* lutf8lib.c */; };
 		91A1E5161F87F61000573AC0 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 91A1E4F21F87F5AC00573AC0 /* lvm.c */; };
@@ -99,6 +100,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		914C0B421F88B0E300F757D5 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		91690E0D1F8883D300222493 /* demo.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = demo.js; sourceTree = "<group>"; };
+		91690E0E1F88970400222493 /* changer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = changer.h; sourceTree = "<group>"; };
+		91690E0F1F88970400222493 /* changer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = changer.c; sourceTree = "<group>"; };
 		91A1E4AD1F87F57500573AC0 /* js */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = js; sourceTree = BUILT_PRODUCTS_DIR; };
 		91A1E4B81F87F5AC00573AC0 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		91A1E4B91F87F5AC00573AC0 /* lapi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lapi.c; sourceTree = "<group>"; };
@@ -186,6 +191,7 @@
 		91A1E4A41F87F57500573AC0 = {
 			isa = PBXGroup;
 			children = (
+				91690E0D1F8883D300222493 /* demo.js */,
 				91A1E4B71F87F5AC00573AC0 /* src */,
 				91A1E4AE1F87F57500573AC0 /* Products */,
 			);
@@ -203,6 +209,9 @@
 		91A1E4B71F87F5AC00573AC0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				91690E0F1F88970400222493 /* changer.c */,
+				914C0B421F88B0E300F757D5 /* test.c */,
+				91690E0E1F88970400222493 /* changer.h */,
 				91A1E4B81F87F5AC00573AC0 /* Makefile */,
 				91A1E4B91F87F5AC00573AC0 /* lapi.c */,
 				91A1E4BA1F87F5AC00573AC0 /* lapi.h */,
@@ -347,8 +356,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91690E101F8897BC00222493 /* changer.c in Sources */,
 				91A1E4F61F87F61000573AC0 /* lapi.c in Sources */,
 				91A1E4F71F87F61000573AC0 /* lauxlib.c in Sources */,
+				914C0B431F88B0E300F757D5 /* test.c in Sources */,
 				91A1E4F81F87F61000573AC0 /* lbaselib.c in Sources */,
 				91A1E4F91F87F61000573AC0 /* lbitlib.c in Sources */,
 				91A1E4FA1F87F61000573AC0 /* lcode.c in Sources */,
@@ -376,7 +387,6 @@
 				91A1E5101F87F61000573AC0 /* ltable.c in Sources */,
 				91A1E5111F87F61000573AC0 /* ltablib.c in Sources */,
 				91A1E5121F87F61000573AC0 /* ltm.c in Sources */,
-				91A1E5131F87F61000573AC0 /* lua.c in Sources */,
 				91A1E5141F87F61000573AC0 /* lundump.c in Sources */,
 				91A1E5151F87F61000573AC0 /* lutf8lib.c in Sources */,
 				91A1E5161F87F61000573AC0 /* lvm.c in Sources */,

@@ -484,11 +484,21 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         else if (check_next1(ls, '>')) return TK_SHR;
         else return '>';
       }
-      case '/': {
-        next(ls);
-        if (check_next1(ls, '/')) return TK_IDIV;
-        else return '/';
-      }
+        case '/': {  /* '-' or '--' (comment) */
+            next(ls);
+            if (ls->current != '/') return '/';
+            /* else is a comment */
+            next(ls);
+            /* else short comment */
+            while (!currIsNewline(ls) && ls->current != EOZ)
+                next(ls);  /* skip until end of line (or end of file) */
+            break;
+        }
+//      case '/': {
+//        next(ls);
+//        if (check_next1(ls, '/')) return TK_IDIV;
+//        else return '/';
+//      }
       case '~': {
         next(ls);
         if (check_next1(ls, '=')) return TK_NE;
