@@ -433,7 +433,7 @@ static const char *getobjname (Proto *p, int lastpc, int reg,
   int pc;
   *name = luaF_getlocalname(p, reg + 1, lastpc);
   if (*name)  /* is a local? */
-    return "local";
+    return "var";
   /* else try symbolic execution */
   pc = findsetreg(p, lastpc, reg);
   if (pc != -1) {  /* could find instruction? */

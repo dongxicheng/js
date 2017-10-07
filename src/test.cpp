@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "lua.hpp"
 #include "changer.h"
 
 static void * my_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
@@ -32,8 +30,10 @@ int main(int argc, const char** args) {
         
         unsigned long size = strlen(buffer);
         const char* cs = changeGrammar(buffer, &size);
-        
-        int error = luaL_loadbufferx(L, cs, size-1, "Rokid", NULL);
+        if( strlen(cs)!=size ) {
+            printf("Error: strlen(cs)!=size: %ld!=%ld",strlen(cs), size);
+        }
+        int error = luaL_loadbufferx(L, cs, size, "Rokid", NULL);
         if (error) {
             const char* s = lua_tostring(L, -1);
             printf("[error] %s", s);

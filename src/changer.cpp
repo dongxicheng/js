@@ -4,6 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <map>
 
 #import "changer.h"
 
@@ -143,6 +151,30 @@ inline static BOOL currentChar(const unsigned char* cs, long i, long length, cha
     }
     return NO;
 }
+
+static std::map<std::string,bool> map;
+static bool mapInited = false;
+
+static void mapInit(){
+    if( mapInited ) {
+        return ;
+    }
+    mapInited = true;
+    map["return"] = true;
+    map["for"] = true;
+    map["if"] = true;
+    map["elseif"] = true;
+    map["while"] = true;
+    map["until"] = true;
+    map["in"] = true;
+    map["and"] = true;
+    map["break"] = true;
+    map["goto"] = true;
+    map["not"] = true;
+    map["or"] = true;
+    map["repeat"] = true;
+}
+
 /*
  * 转换成标准lua语法
  */
@@ -154,14 +186,16 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
         if( !inited ) {
             inited = YES;
             charTypesInited();
+            mapInit();
         }
     }
     if( data && length>0 ) {
         unsigned long csLen = length;
-        unsigned char* cs = (unsigned char*)malloc(csLen);
+        unsigned char* cs = (unsigned char*)malloc(csLen+16);
         memcpy(cs, data, csLen);
+        cs[csLen] = 0;
         
-        char* thisArr = (char*) malloc(csLen);
+        char* thisArr = (char*) malloc(csLen+16);
         memset(thisArr, 0, csLen);
         long thisNum = 0;
         
@@ -186,7 +220,9 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
                     unsigned long j = i;
                     i = skipName(cs, i, length);
                     unsigned long k = i;
-                    if( k-j==6 && cs[j+0]=='r' && cs[j+1]=='e' && cs[j+2]=='t' && cs[j+3]=='u' && cs[j+4]=='r' && cs[j+5]=='n') {
+                    std::string name( (const char*)cs+j, k-j);
+                    if( map[name] ) {
+                        // 非函数
                         break;
                     }
                     i = skipSpace(cs, i, length);
@@ -211,14 +247,19 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
                     break;
                 }
                 case LV_TYPE_CHAR_POINT:{
-                    if( currentChar(cs, i, length, '.') && currentChar(cs, i+1, length, '.') ) {
+                    if ( currentChar(cs, i, length, '.') && currentChar(cs, i+1, length, '.') ) {
                         i += 2;
-                    }else if( currentChar(cs, i, length, '.') || currentChar(cs, i, length, ':') ) {
+                    } else if ( currentChar(cs, i, length, '.') || currentChar(cs, i, length, ':') ) {
                         long i0 = i;
                         i++;
                         i = skipSpace(cs, i, length);
                         long i2 = skipName(cs, i, length);
                         if( i2>i ) {
+                            std::string name( (const char*)cs+i, i2-i);
+                            if( name=="function" ) {
+                                // 匿名函数
+                                break;
+                            }
                             i = i2;
                             i = skipSpace(cs, i, length);
                             if( currentChar(cs, i, length, '(') ) {
@@ -257,7 +298,7 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
             }
         }
         free(cs);
-        *pLength = length + thisNum*THIS_LEN;
+        *pLength = j;
         printf("changer: %s\n", cs2);
         return (const char*)cs2;
     }
