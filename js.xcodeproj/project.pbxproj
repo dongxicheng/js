@@ -168,6 +168,7 @@
 		91A1E4F41F87F5AC00573AC0 /* lzio.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lzio.c; sourceTree = "<group>"; };
 		91A1E4F51F87F5AC00573AC0 /* lzio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lzio.h; sourceTree = "<group>"; };
 		91A1E5411F87F65600573AC0 /* jsc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jsc; sourceTree = BUILT_PRODUCTS_DIR; };
+		91FEBC971F8A422900F7B189 /* luajs虚拟机改造TODO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "luajs虚拟机改造TODO.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +192,7 @@
 		91A1E4A41F87F57500573AC0 = {
 			isa = PBXGroup;
 			children = (
+				91FEBC961F8A422900F7B189 /* doc */,
 				91690E0D1F8883D300222493 /* demo.js */,
 				91A1E4B71F87F5AC00573AC0 /* src */,
 				91A1E4AE1F87F57500573AC0 /* Products */,
@@ -276,6 +278,14 @@
 				91A1E4F51F87F5AC00573AC0 /* lzio.h */,
 			);
 			path = src;
+			sourceTree = "<group>";
+		};
+		91FEBC961F8A422900F7B189 /* doc */ = {
+			isa = PBXGroup;
+			children = (
+				91FEBC971F8A422900F7B189 /* luajs虚拟机改造TODO.md */,
+			);
+			path = doc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

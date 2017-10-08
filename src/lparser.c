@@ -1467,6 +1467,42 @@ static void forstat (LexState *ls, int line) {
 }
 
 
+static void exprstat (LexState *ls);
+static void localstat (LexState *ls);
+static void JSforstat (LexState *ls, int line) {
+  /* whilestat -> WHILE cond DO block END */
+  FuncState *fs = ls->fs;
+  int forinit;
+  int condexit;
+  int moreThanOne = 0;
+  BlockCnt bl;
+  luaX_next(ls);  /* skip 'for' */
+  checknext(ls, '(');
+  testnext(ls, TK_LOCAL);
+  localstat(ls);// 声明局部变量
+  checknext(ls, ';');
+  forinit = luaK_getlabel(fs);
+  condexit = cond(ls);
+  checknext(ls, ';');
+  checknext(ls, ')');
+  enterblock(fs, &bl, 1);
+  
+  if ( testnext(ls, '{') ){
+    moreThanOne = 1;
+    block(ls);
+  } else {
+    moreThanOne = 0;
+    block_oneline(ls);
+  }
+  luaK_jumpto(fs, forinit);
+  if( moreThanOne ) {
+    check_match(ls, '}', TK_FOR, line);
+  }
+  leaveblock(fs);
+  luaK_patchtohere(fs, condexit);  /* false conditions finish the loop */
+}
+
+
 static void test_then_block (LexState *ls, int *escapelist) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   BlockCnt bl;
@@ -1664,7 +1700,7 @@ static void statement (LexState *ls) {
       break;
     }
     case TK_FOR: {  /* stat -> forstat */
-      forstat(ls, line);
+      JSforstat(ls, line);
       break;
     }
     case TK_REPEAT: {  /* stat -> repeatstat */
