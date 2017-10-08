@@ -1473,6 +1473,7 @@ static void JSforstat (LexState *ls, int line) {
   /* whilestat -> WHILE cond DO block END */
   FuncState *fs = ls->fs;
   int forinit;
+  int forIaddadd = NO_JUMP;
   int condexit;
   int moreThanOne = 0;
   BlockCnt bl;
@@ -1484,7 +1485,17 @@ static void JSforstat (LexState *ls, int line) {
   forinit = luaK_getlabel(fs);
   condexit = cond(ls);
   checknext(ls, ';');
-  checknext(ls, ')');
+  if( testnext(ls, ')') ) {
+  } else {
+    // 该处效率不高, 后续优化, TODO 董希成
+    int escapelist = NO_JUMP;
+    luaK_concat(fs, &escapelist, luaK_jump(fs));  /* must jump over it */
+    forIaddadd = luaK_getlabel(fs);
+    exprstat(ls);
+    luaK_jumpto(fs, forinit);
+    luaK_patchtohere(fs, escapelist);
+    checknext(ls, ')');
+  }
   enterblock(fs, &bl, 1);
   
   if ( testnext(ls, '{') ){
@@ -1494,7 +1505,11 @@ static void JSforstat (LexState *ls, int line) {
     moreThanOne = 0;
     block_oneline(ls);
   }
-  luaK_jumpto(fs, forinit);
+  if( forIaddadd>=0 ) {
+    luaK_jumpto(fs, forIaddadd);
+  } else {
+    luaK_jumpto(fs, forinit);
+  }
   if( moreThanOne ) {
     check_match(ls, '}', TK_FOR, line);
   }

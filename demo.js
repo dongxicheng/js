@@ -30,9 +30,9 @@ if( false ) {
 
 print("测试单行if--1--");
 if( false )
-print( "if 33 true");
+  print( "if 33 true");
 else
-print("if 33 false");
+  print("if 33 false");
 
 print("测试单行if--2--");
 
@@ -44,10 +44,9 @@ while(i<10) {
 }
 
 
-// ---------------  for语法测试 有错误!!!!!
-for ( i=1; i<10;) {
+// ---------------  for语法测试 ok
+for ( i=1; i<10; i=i+1 ) {
   print("for测试: i=", i);
-  i = i + 1;
 }
 
 // ---------------  json语法 测试ok
@@ -99,9 +98,8 @@ alert(object.getNameFunc()());  //The Window
 
 function box(){
   var arr=[];
-  for(i=0; i<5;){
+  for(i=0; i<5; i=i+1){
     arr[i]=function(){return i;}
-    i = i+ 1;
   }
   return arr;
 }
