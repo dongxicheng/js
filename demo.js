@@ -1,6 +1,4 @@
 
-alert = print;
-
 function test(a, b){
     print("a = ", a, ", b = ", b);
     return ("hel");
