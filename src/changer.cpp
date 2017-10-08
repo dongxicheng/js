@@ -15,20 +15,6 @@
 
 #import "changer.h"
 
-
-#ifndef YES
-#define YES 1
-#endif
-
-#ifndef NO
-#define NO 0
-#endif
-
-#ifndef BOOL
-#define BOOL int
-#endif
-
-
 // ‘.’ 和‘:’ 相互转化代码
 #define LV_TYPE_WORD_FIRST    (1)
 #define LV_TYPE_WORD_SECOND   (2)
@@ -145,14 +131,14 @@ inline static long skipOther(const unsigned char* cs, long i, long length){
     return i;
 }
 
-inline static BOOL currentChar(const unsigned char* cs, long i, long length, char c){
+inline static bool currentChar(const unsigned char* cs, long i, long length, char c){
     if( i<length && cs[i]==c ) {
-        return YES;
+        return true;
     }
-    return NO;
+    return false;
 }
 
-static std::map<std::string,bool> map;
+static std::map<std::string,bool> keyWordMap;
 static bool mapInited = false;
 
 static void mapInit(){
@@ -160,44 +146,44 @@ static void mapInit(){
         return ;
     }
     mapInited = true;
-    map["return"] = true;
-    map["for"] = true;
-    map["if"] = true;
-    map["elseif"] = true;
-    map["while"] = true;
-    map["until"] = true;
-    map["in"] = true;
-    map["and"] = true;
-    map["break"] = true;
-    map["goto"] = true;
-    map["not"] = true;
-    map["or"] = true;
-    map["repeat"] = true;
+    keyWordMap["return"] = true;
+    keyWordMap["for"] = true;
+    keyWordMap["if"] = true;
+    keyWordMap["elseif"] = true;
+    keyWordMap["while"] = true;
+    keyWordMap["until"] = true;
+    keyWordMap["in"] = true;
+    keyWordMap["and"] = true;
+    keyWordMap["break"] = true;
+    keyWordMap["goto"] = true;
+    keyWordMap["not"] = true;
+    keyWordMap["or"] = true;
+    keyWordMap["repeat"] = true;
 }
 
-/*
- * 转换成标准lua语法
- */
-const char* changeGrammar(const char* data0, unsigned long* pLength){
-    const unsigned char* data = (const unsigned char*)data0;
-    unsigned long length = *pLength;
+typedef enum {
+    CHANGE_TYPE_NONE = 0,
+    CHANGE_TYPE_INSERT1 = 1,
+    CHANGE_TYPE_INSERT2 = 2,
+    CHANGE_TYPE_REPLACE = 3,
+} EnumChangeType;
+
+const char* changeGrammar(const char* data, unsigned long* pLength){
+    const unsigned long length = *pLength;
     {
-        static BOOL inited = NO;
+        static bool inited = false;
         if( !inited ) {
-            inited = YES;
+            inited = true;
             charTypesInited();
             mapInit();
         }
     }
     if( data && length>0 ) {
-        unsigned long csLen = length;
-        unsigned char* cs = (unsigned char*)malloc(csLen+16);
-        memcpy(cs, data, csLen);
-        cs[csLen] = 0;
+        const unsigned char* cs = (const unsigned char*)data;
         
-        char* thisArr = (char*) malloc(csLen+16);
-        memset(thisArr, 0, csLen);
-        long thisNum = 0;
+        EnumChangeType* changeTypes = (EnumChangeType*) malloc( (length+16)*sizeof(EnumChangeType) );
+        memset(changeTypes, 0, length);
+        long changeNum = 0;
         
         for ( long i=0; i<length;) {
             unsigned char c = cs[i];
@@ -221,16 +207,18 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
                     i = skipName(cs, i, length);
                     unsigned long k = i;
                     std::string name( (const char*)cs+j, k-j);
-                    if( map[name] ) {
+                    if( keyWordMap[name] ) {
                         // 非函数
                         break;
                     }
                     i = skipSpace(cs, i, length);
                     if( currentChar(cs, i, length, '(') ) {
                         if( currentChar(cs, i+1, length, ')') ) {
-                            thisArr[i++] = 1; thisNum++;
+                            changeTypes[i++] = CHANGE_TYPE_INSERT1;
+                            changeNum++;
                         } else {
-                            thisArr[i++] = 2; thisNum++;
+                            changeTypes[i++] = CHANGE_TYPE_INSERT2;
+                            changeNum++;
                         }
                     }
                     break;
@@ -239,9 +227,11 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
                     i++;
                     if( currentChar(cs, i, length, '(') ) {
                         if( currentChar(cs, i+1, length, ')') ) {
-                            thisArr[i++] = 1; thisNum++;
+                            changeTypes[i++] = CHANGE_TYPE_INSERT1;
+                            changeNum++;
                         } else {
-                            thisArr[i++] = 2; thisNum++;
+                            changeTypes[i++] = CHANGE_TYPE_INSERT2;
+                            changeNum++;
                         }
                     }
                     break;
@@ -265,7 +255,7 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
                             if( currentChar(cs, i, length, '(') ) {
                                 unsigned char tempChar = cs[i0];
                                 if( (char)tempChar=='.' ) {
-                                    cs[i0] = ':';
+                                    changeTypes[i0] = CHANGE_TYPE_REPLACE;
                                 }
                                 break;
                             }
@@ -282,25 +272,37 @@ const char* changeGrammar(const char* data0, unsigned long* pLength){
         }
         const char* THIS = "this,";
         const unsigned long THIS_LEN = strlen(THIS);
-        long cs2Len = csLen + thisNum*THIS_LEN;
-        unsigned char* cs2 = (unsigned char*) malloc(cs2Len+16);
-        memset(cs2, 0, cs2Len+16);
+        long newLength = length + changeNum*THIS_LEN;
+        unsigned char* newChars = (unsigned char*) malloc(newLength+16);
+        memset(newChars, 0, newLength+16);
         long i=0;
         long j=0;
         for(;i<length;) {
-            cs2[j++] = cs[i++];
-            if( thisArr[i-1]==1 ) {
-                memcpy(cs2+j, THIS, THIS_LEN-1);
-                j += THIS_LEN-1;
-            } else if( thisArr[i-1]==2 ) {
-                memcpy(cs2+j, THIS, THIS_LEN);
-                j += THIS_LEN;
+            long i0 = i;
+            newChars[j++] = cs[i++];
+            switch (changeTypes[i0]) {
+                case CHANGE_TYPE_NONE:
+                    break;
+                case CHANGE_TYPE_REPLACE:
+                    newChars[j-1] = ':';
+                    break;
+                case CHANGE_TYPE_INSERT1:
+                    memcpy(newChars+j, THIS, THIS_LEN-1);
+                    j += THIS_LEN-1;
+                    break;
+                case CHANGE_TYPE_INSERT2:
+                    memcpy(newChars+j, THIS, THIS_LEN);
+                    j += THIS_LEN;
+                    break;
+                default:
+                    printf("[Error] changeTypes[i0] \n");
+                    break;
             }
         }
-        free(cs);
+        
         *pLength = j;
-        printf("changer: %s\n", cs2);
-        return (const char*)cs2;
+        printf("changer: %s\n", newChars);
+        return (const char*)newChars;
     }
     return 0;
 }

@@ -16,11 +16,27 @@ if( true ) {
     print("false");
 }
 
+print("测试单行if--1--");
+if( true )
+    print("if 222 true");
+else
+    print("if 222 false");
+print("测试单行if--2--");
+
+
 if( false ) {
     print("true");
 } else {
     print("false");
 }
+
+print("测试单行if--1--");
+if( false )
+    print( "if 33 true");
+else
+    print("if 33 false");
+
+print("测试单行if--2--");
 
 //  ---------------   while语法测试 ok
 var i=1;
