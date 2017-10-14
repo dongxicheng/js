@@ -4,4 +4,6 @@
 * for 循环中break continue支持
 * do while
 * 基本类型 方法调用
-* 运算符支持: ++ --  += 
+* 运算符支持: ++ --  +=
+
+* https://github.com/svaarala/duktape/tree/master/tests/ecmascript

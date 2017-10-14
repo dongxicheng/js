@@ -108,3 +108,35 @@ alert(a);//包含五个函数体的数组
 alert(a[0]());
 alert(a[1]());
 
+
+function Test(){
+  print("test");
+}
+
+function Temp(){
+  print("temp");
+}
+
+Temp.prototype.name = "hello333";
+Test.prototype.name = "hello";
+
+print( Temp.prototype.name );
+print( Test.prototype.name  );
+
+
+
+function Person(name, age){
+  print("hello");
+}
+
+a.prototype.chat = function(){
+  print("test a.prototype");
+};
+
+Person.prototype.chat = function(){
+  
+};
+
+
+a.chat();
+a.chat2();
