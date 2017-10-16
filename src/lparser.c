@@ -140,6 +140,14 @@ static TString *str_checkname (LexState *ls) {
   return ts;
 }
 
+static TString *str_checkname_new (LexState *ls) {
+  TString *ts;
+  check(ls, TK_NEW);
+  ts = ls->t.seminfo.ts;
+  luaX_next(ls);
+  return ts;
+}
+
 static TString *str_checkname2 (LexState *ls) {
   TString *ts;
   check(ls, TK_STRING);
@@ -307,6 +315,19 @@ static void singlevar (LexState *ls, expdesc *var) {
   TString *varname = str_checkname(ls);
   FuncState *fs = ls->fs;
   singlevaraux(fs, varname, var, 1);
+  if (var->k == VVOID) {  /* global name? */
+    expdesc key;
+    singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
+    lua_assert(var->k != VVOID);  /* this one must exist */
+    codestring(ls, &key, varname);  /* key is variable name */
+    luaK_indexed(fs, var, &key);  /* env[varname] */
+  }
+}
+
+static void singlevar_new (LexState *ls, expdesc *var) {
+  TString *varname = str_checkname_new(ls);
+  FuncState *fs = ls->fs;
+  init_exp(var, VVOID, 0);  /* default is global */
   if (var->k == VVOID) {  /* global name? */
     expdesc key;
     singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
@@ -912,7 +933,34 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
                           (unless changed) one result */
 }
 
+static void funcargs_new (LexState *ls, expdesc *f, int line) {
+  FuncState *fs = ls->fs;
+  expdesc args;
+  int base, nparams;
+  
+  singlevar(ls, &args);
+  luaK_exp2nextreg(ls->fs, &args);
+  checknext(ls, '(');
+  
+  explist(ls, &args);
+  luaK_setmultret(fs, &args);
 
+  check_match(ls, ')', '(', line);
+      
+  lua_assert(f->k == VNONRELOC);
+  base = f->u.info;  /* base register for call */
+  if (hasmultret(args.k))
+  nparams = LUA_MULTRET;  /* open call */
+  else {
+    if (args.k != VVOID)
+    luaK_exp2nextreg(fs, &args);  /* close last argument */
+    nparams = fs->freereg - (base+1);
+  }
+  init_exp(f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams+1, 2));
+  luaK_fixline(fs, line);
+  fs->freereg = base+1;  /* call remove function and arguments and leaves
+                          (unless changed) one result */
+}
 
 
 /*
@@ -981,6 +1029,16 @@ static void suffixedexp (LexState *ls, expdesc *v) {
   }
 }
 
+static void suffixedexp_new (LexState *ls, expdesc *v) {
+  /* suffixedexp ->
+   primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
+  FuncState *fs = ls->fs;
+  int line = ls->linenumber;
+  
+  luaK_exp2nextreg(fs, v);
+  funcargs_new(ls, v, line);
+  
+}
 
 static void simpleexp (LexState *ls, expdesc *v) {
   /* simpleexp -> FLT | INT | STRING | NIL | TRUE | FALSE | ... |
@@ -1027,6 +1085,11 @@ static void simpleexp (LexState *ls, expdesc *v) {
     case TK_FUNCTION: {
       luaX_next(ls);
       body(ls, v, 0, ls->linenumber);
+      return;
+    }
+    case TK_NEW:{
+      singlevar_new(ls, v);
+      suffixedexp_new(ls, v);
       return;
     }
     default: {

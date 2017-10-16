@@ -1,4 +1,14 @@
 
+_G["new"] = function(...){
+  var obj = {};
+  print("------", this.prototype, obj.prototype);
+  obj.prototype = this.prototype;
+  pcall(...);
+  print(this,...);
+  return obj;
+}
+
+
 function test(a, b){
   print("a = ", a, ", b = ", b);
   return ("hel");
@@ -134,9 +144,14 @@ a.prototype.chat = function(){
 };
 
 Person.prototype.chat = function(){
-  
+  print("my name is person");
 };
 
 
 a.chat();
+
+var temp = new Person(1,2,3);
+temp.chat();
+
+
 a.chat2();

@@ -35,8 +35,17 @@ __function(); \
 __object_prototype.prototype = __object_prototype; \
 \
 \
+\
+\
 ";
 
+//\
+//function new(f){ \
+//  var obj = {}; \
+//  pcall(f, obj); \
+//  obj.prototype = f.prototype; \
+//  return obj; \
+//} \
 
 static int run(lua_State* L, const char* buffer){
   unsigned long size = strlen(buffer);
@@ -66,6 +75,25 @@ static int run(lua_State* L, const char* buffer){
   }
 }
 
+int __new(lua_State* L){
+  lua_checkstack(L, 32);
+  int argN = lua_gettop(L)-1;
+  if( lua_type(L, 1)==LUA_TFUNCTION ) {
+    lua_remove(L, 2);
+    lua_newtable(L);
+    lua_pushvalue(L, -1);
+    lua_insert(L, 2);
+    lua_insert(L, 1);
+    
+    int errorCode = lua_pcall(L, argN, 0, 0);
+    if ( errorCode != 0 ) {
+      const char* s = lua_tostring(L, -1);
+      printf("%s", s);
+      return 0;
+    }
+  }
+  return 1;
+}
 
 int main(int argc, const char** args) {
   if( argc>=2 ) {
@@ -101,6 +129,9 @@ int main(int argc, const char** args) {
     lua_setglobal(L, "this");
     lua_getglobal(L, "print");
     lua_setglobal(L, "alert");
+    
+//    lua_pushcclosure(L, __new, 0);
+//    lua_setglobal(L, "new");
     
     run(L, __code);
     return run(L, buffer);
