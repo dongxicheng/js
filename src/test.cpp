@@ -36,6 +36,14 @@ __object_prototype.prototype = __object_prototype; \
 \
 \
 \
+_G['new'] = function(...){ \
+  var obj = {}; \
+  setmetatable( obj, {__index=this.prototype} ); \
+  pcall3(obj,...); \
+  return obj; \
+} \
+\
+\
 \
 ";
 

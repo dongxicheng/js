@@ -426,6 +426,16 @@ static int luaB_pcall (lua_State *L) {
   return finishpcall(L, status, 0);
 }
 
+static int luaB_pcall3 (lua_State *L) {
+  int status;
+  lua_remove(L, 3);
+  luaL_checkany(L, 1);
+  lua_pushboolean(L, 1);  /* first result if no errors */
+  lua_insert(L, 1);  /* put it in place */
+  status = lua_pcallk(L, lua_gettop(L) - 2, LUA_MULTRET, 0, 0, finishpcall);
+  return finishpcall(L, status, 0);
+}
+
 
 /*
 ** Do a protected call with error handling. After 'lua_rotate', the
@@ -466,6 +476,7 @@ static const luaL_Reg base_funcs[] = {
   {"next", luaB_next},
   {"pairs", luaB_pairs},
   {"pcall", luaB_pcall},
+  {"pcall3", luaB_pcall3},
   {"print", luaB_print},
   {"rawequal", luaB_rawequal},
   {"rawlen", luaB_rawlen},

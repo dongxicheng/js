@@ -1,14 +1,4 @@
 
-_G["new"] = function(...){
-  var obj = {};
-  print("------", this.prototype, obj.prototype);
-  obj.prototype = this.prototype;
-  pcall(...);
-  print(this,...);
-  return obj;
-}
-
-
 function test(a, b){
   print("a = ", a, ", b = ", b);
   return ("hel");
@@ -40,9 +30,9 @@ if( false ) {
 
 print("测试单行if--1--");
 if( false )
-  print( "if 33 true");
+print( "if 33 true");
 else
-  print("if 33 false");
+print("if 33 false");
 
 print("测试单行if--2--");
 
@@ -111,6 +101,7 @@ function box(){
   for(i=0; i<5; i=i+1){
     arr[i]=function(){return i;}
   }
+  arr.name = "array"
   return arr;
 }
 var a=box();
@@ -136,22 +127,25 @@ print( Test.prototype.name  );
 
 
 function Person(name, age){
-  print("hello");
+  print("Person,", name, age );
+  this.name = name;
+  this.age = age;
 }
 
 a.prototype.chat = function(){
-  print("test a.prototype");
+  print("object a is", this.name);
 };
 
 Person.prototype.chat = function(){
-  print("my name is person");
+  print("persion name is ", this.name, ",  age=", this.age);
 };
 
 
 a.chat();
 
-var temp = new Person(1,2,3);
+var temp = new Person("dongxicheng", 35);
 temp.chat();
 
 
-a.chat2();
+//a.chat2();
+
